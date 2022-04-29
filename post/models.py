@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
 # Create your models here.
@@ -40,3 +41,35 @@ class Post(models.Model):
 class Image(models.Model):
     image = models.ImageField(upload_to='images')
     product = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='images')
+
+
+class Rating(models.Model):
+    product = models.ForeignKey(Post,
+                                on_delete=models.CASCADE,
+                                related_name='rating'
+                                )
+    owner = models.ForeignKey(User,
+                              on_delete=models.CASCADE,
+                              related_name='rating'
+                              )
+    rating = models.SmallIntegerField(validators=[
+        MinValueValidator(1),
+        MaxValueValidator(5)
+    ])
+
+
+class Like(models.Model):
+    owner = models.ForeignKey(User,
+                              on_delete=models.CASCADE,
+                              related_name='like',
+                              verbose_name='Владелец лайка'
+                              )
+    product = models.ForeignKey(Post,
+                                on_delete=models.CASCADE,
+                                related_name='like',
+                                verbose_name='Пост'
+                                )
+    like = models.BooleanField('ЛАЙК', default=False)
+
+    def __str__(self):
+        return f'{self.owner}, {self.like}'
