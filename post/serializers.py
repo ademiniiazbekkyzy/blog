@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from post.models import Category, Image, Post, Rating
+from post.models import Category, Image, Post, Rating, Favorite
 
 
 class CategorySerializers(serializers.ModelSerializer):
@@ -13,6 +13,12 @@ class RatingSerializers(serializers.ModelSerializer):
     class Meta:
         model = Rating
         fields = ('rating',)
+
+
+class FavoriteSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = Favorite
+        fields = '__all__'
 
 
 class PostImageSerializers(serializers.ModelSerializer):
@@ -48,4 +54,7 @@ class PostSerializer(serializers.ModelSerializer):
         else:
             representation['rating'] = rating_result / instance.rating.all().count()
         representation['likes'] = instance.like.filter(like=True).count()
+        return representation
+
+        representation['favorite'] = instance.favorite.filter(favorite=True)
         return representation

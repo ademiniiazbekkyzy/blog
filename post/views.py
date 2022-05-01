@@ -8,9 +8,9 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 
-from post.filters import ProductFilter
-from post.models import Post, Rating, Category, Like
-from post.serializers import PostSerializer, RatingSerializers, CategorySerializers
+from post.filters import PostFilter
+from post.models import Post, Rating, Category, Like, Favorite
+from post.serializers import PostSerializer, RatingSerializers, CategorySerializers, FavoriteSerializers
 
 
 class LargeResultsSetPagination(PageNumberPagination):
@@ -19,12 +19,12 @@ class LargeResultsSetPagination(PageNumberPagination):
     max_page_size = 1000000
 
 
-class ProductViewSet(ModelViewSet):
+class PostViewSet(ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     pagination_class = LargeResultsSetPagination
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_class = ProductFilter
+    filterset_class = PostFilter
     ordering_fields = ['id', 'price']
     search_fields = ['name', 'description']
 
@@ -69,6 +69,16 @@ class ProductViewSet(ModelViewSet):
             status = 'unlike'
         return Response({'status': status})
 
+    @action(methods=['POST'], detail=True)
+    def favorite(self, request, *args, **kwargs):
+        product = self.get_object()
+        favorite_obj, _ = Favorite.objects.get_or_create(product=product, owner=request.user)
+        favorite_obj.favorite = not favorite_obj.favorite
+        favorite_obj.save()
+        status = 'Added to favorites'
+        if not favorite_obj.favorite:
+            status = 'Removed from favorites'
+        return Response({'status': status})
 
 
 class CategoryListCreateView(ListCreateAPIView):
@@ -77,7 +87,13 @@ class CategoryListCreateView(ListCreateAPIView):
     permission_classes = [IsAuthenticated]
 
 
-class CategoryRetriveDeleteUpdateView(RetrieveUpdateDestroyAPIView):
+class FavoriteListView(ListAPIView):
+    queryset = Favorite.objects.all()
+    serializer_class = FavoriteSerializers
+    permission_classes = [IsAuthenticated]
+
+
+class CategoryRetrieveDeleteUpdateView(RetrieveUpdateDestroyAPIView):
     lookup_field = 'slug'
     queryset = Category.objects.all()
     serializer_class = CategorySerializers

@@ -59,7 +59,7 @@ class ChangePasswordSerializer(serializers.Serializer):
         user = self.context.get('request').user
         if not user.check_password(old_pass):
             raise serializers.ValidationError('Неверный пароль!')
-        return  old_pass
+        return old_pass
 
     def validate(self, attrs):
         pass1 = attrs.get('password')

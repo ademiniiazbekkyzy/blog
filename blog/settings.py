@@ -42,14 +42,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'account',
+    'post',
+    'cart',
+
     'rest_framework',
     'rest_framework.authtoken',
     'drf_yasg',
     'django_filters',
-
-    'account',
-    'post',
-    'cart',
 ]
 
 MIDDLEWARE = [

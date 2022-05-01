@@ -1,11 +1,12 @@
 from django.contrib import admin
 
 # Register your models here.
-from post.models import Image, Post, Rating, Category
+from post.models import Image, Post, Rating, Category, Favorite
 
 admin.site.register(Category)
 admin.site.register(Rating)
 admin.site.register(Image)
+admin.site.register(Favorite)
 
 
 class ImageInAdmin(admin.TabularInline):
@@ -15,7 +16,7 @@ class ImageInAdmin(admin.TabularInline):
 
 
 @admin.register(Post)
-class ProductAdmin(admin.ModelAdmin):
+class PostAdmin(admin.ModelAdmin):
     inlines = [
         ImageInAdmin
     ]
