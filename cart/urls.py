@@ -6,3 +6,4 @@ router = DefaultRouter()
 router.register('', CartViewSet)
 
 urlpatterns = []
+urlpatterns.extend(router.urls)

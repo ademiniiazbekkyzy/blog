@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from post.models import Category, Image, Post, Rating, Favorite
+from post.models import Category, Image, Post, Rating, Favorite, Comments, Comments
 
 
 class CategorySerializers(serializers.ModelSerializer):
@@ -16,8 +16,17 @@ class RatingSerializers(serializers.ModelSerializer):
 
 
 class FavoriteSerializers(serializers.ModelSerializer):
+    owner = serializers.ReadOnlyField(source='owner.email')
     class Meta:
         model = Favorite
+        fields = '__all__'
+
+
+class CommentsSerializers(serializers.ModelSerializer):
+    owner = serializers.ReadOnlyField(source='owner.email')
+
+    class Meta:
+        model = Comments
         fields = '__all__'
 
 
@@ -30,10 +39,12 @@ class PostImageSerializers(serializers.ModelSerializer):
 class PostSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.email')
     images = PostImageSerializers(many=True, read_only=True)
+    comments = CommentsSerializers(many=True, read_only=True)
+    created_at = serializers.DateTimeField(format='%D/%M/%Y %H:%M:%s', read_only=True)
 
     class Meta:
         model = Post
-        fields = ('id', 'owner', 'name', 'description', 'price', 'category', 'images')
+        fields = ('id', 'owner', 'name', 'description', 'price', 'category', 'images', 'comments', 'created_at')
 
     def create(self, validated_data):
         request = self.context.get('request')
@@ -56,5 +67,7 @@ class PostSerializer(serializers.ModelSerializer):
         representation['likes'] = instance.like.filter(like=True).count()
         return representation
 
-        representation['favorite'] = instance.favorite.filter(favorite=True)
+        representation['favorite'] = instance.favorite.filter(favorite=True).data
         return representation
+
+

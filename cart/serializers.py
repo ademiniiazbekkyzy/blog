@@ -8,6 +8,24 @@ class CartItemSerializer(serializers.ModelSerializer):
         model = CartItem
         fields = ('product', 'quantity', 'total_cost')
 
+    # def to_representation(self, instance):
+    #     representation = super().to_representation(instance)
+    #     representation['product'] = f'{instance.product}'
+    #     return representation
+
+# {
+#     "items": [
+#         {
+#         "product":"68",
+#         "quantity":3
+#         },
+#         {
+#         "product":"69",
+#         "quantity":1
+#         }
+#     ]
+# }
+
 
 class CartSerializer(serializers.ModelSerializer):
     items = CartItemSerializer(many=True, write_only=True)
@@ -19,14 +37,13 @@ class CartSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         request = self.context.get('request')
         items = validated_data.pop('items')
-        print(items)
         user = request.user
         cart, _ = Cart.objects.get_or_create(user=user)
         for item in items:
             try:
                 cart_item = CartItem.objects.get(cart=cart,
                                                  product=item['product'])
-                cart_item.quantity = quantity = item['quantity']
+                cart_item.quantity = item['quantity']
             except CartItem.DoesNotExist:
                 cart_item = CartItem(cart=cart, product=item['product'], quantity=item['quantity'])
             cart_item.save()

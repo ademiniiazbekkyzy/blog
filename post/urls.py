@@ -6,8 +6,10 @@ router = DefaultRouter()
 router.register('', PostViewSet)
 
 urlpatterns = [
-    path('category/', CategoryListCreateView.as_view()),
+    path('categories/', CategoryListCreateView.as_view()),
     path('category/<str:slug>/', CategoryRetrieveDeleteUpdateView.as_view()),
+    path('comments/', CommentsListView.as_view()),
+    path('comment/<str:product>/', CommentsRetrieveDeleteUpdateView.as_view()),
     path('favorites/', FavoriteListView.as_view()),
     path('', include(router.urls)),
 ]

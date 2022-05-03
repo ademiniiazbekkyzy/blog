@@ -10,5 +10,5 @@ class PostFilter(filters.FilterSet):
 
     class Meta:
         model = Post
-        fields = ['name', 'price_from', 'price_to', 'category']
+        fields = ['name', 'price_from', 'price_to', 'category', 'status']
 

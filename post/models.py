@@ -27,12 +27,19 @@ class Category(models.Model):
 
 
 class Post(models.Model):
+    CHOICES = (
+        ('in stock', 'в наличии'),
+        ('out of stock', 'нет в наличии')
+    )
     owner = models.ForeignKey(User, related_name='products', on_delete=models.CASCADE)
     name = models.CharField(max_length=30)
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
     category = models.ForeignKey(Category, related_name='products', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(default='')
     # image = models.ImageField(upload_to='images', null=True, blank=True)
+    status = models.CharField(choices=CHOICES, max_length=20, default='нет в наличии')
+    # users = models.ManyToManyField(User, related_name='favorite_posts')
 
     def __str__(self):
         return self.name
@@ -85,8 +92,21 @@ class Favorite(models.Model):
                               related_name='favorite'
                               )
     favorite = models.BooleanField('FAVORITE', default=False)
+    # users = models.ManyToManyField(User, related_name='favorite')
 
     def __str__(self):
         return f'{self.owner}, {self.favorite}'
 
 
+class Comments(models.Model):
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments')
+    product = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
+    comments = models.TextField()
+    # likes = models.ManyToManyField(
+    #     User, blank=True, related_name="comment_likers")
+    # number_of_likes = models.IntegerField(
+    #     validators=[MinValueValidator(0)], default=0)
+
+    def __str__(self):
+        return self.owner, self.comments
+# owner = models.ForeignKey(User, related_name='products', on_delete=models.CASCADE)
